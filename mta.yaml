@@ -1,0 +1,158 @@
+_schema-version: 3.3.0
+ID: spreadsheet-upload
+description: A simple CAP project.
+version: 1.0.0
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx cds build --production
+modules:
+  - name: spreadsheet-upload-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: spreadsheet-upload-auth
+      - name: spreadsheet-upload-db
+      - name: spreadsheet-upload-destination-service
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+      instances: 1
+    build-parameters:
+      builder: npm-ci
+
+  - name: spreadsheet-upload-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: spreadsheet-upload-db
+    parameters:
+      buildpack: nodejs_buildpack
+
+  - name: spreadsheet-upload-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: spreadsheet-upload-destination-service
+        parameters:
+          content-target: true
+      - name: spreadsheet-upload-repo-host
+        parameters:
+          service-key:
+            name: spreadsheet-upload-repo-host-key
+      - name: spreadsheet-upload-auth
+        parameters:
+          service-key:
+            name: spreadsheet-upload-auth-key
+      - name: srv-api
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: spreadsheet-upload-repo-host
+              ServiceInstanceName: spreadsheet-upload-html5-service
+              ServiceKeyName: spreadsheet-upload-repo-host-key
+              sap.cloud.service: com.demo.spreadsheetupload
+            - Authentication: OAuth2UserTokenExchange
+              Name: spreadsheet-upload-auth
+              ServiceInstanceName: spreadsheet-upload-auth
+              ServiceKeyName: spreadsheet-upload-auth-key
+              sap.cloud.service: com.demo.spreadsheetupload
+            - Authentication: OAuth2UserTokenExchange
+              Name: spreadsheet-upload-app-srv
+              TokenServiceInstanceName: spreadsheet-upload-auth
+              TokenServiceKeyName: spreadsheet-upload-auth-key
+              URL: ~{srv-api/srv-url}
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+  - name: spreadsheet-upload-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: spreadsheet-upload-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - demobookshop.zip
+          name: demobookshop
+          target-path: resources/
+        - artifacts:
+            - demopublishing.zip
+          name: demopublishing
+          target-path: resources/
+
+  - name: demobookshop
+    type: html5
+    path: app/bookshop
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+
+  - name: demopublishing
+    type: html5
+    path: app/publishing
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+resources:
+  - name: spreadsheet-upload-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        oauth2-configuration:
+          credential-types:
+            - binding-secret
+            - x509
+        tenant-mode: dedicated
+        xsappname: spreadsheet-upload-${org}-${space}
+      path: ./xs-security.json
+      service: xsuaa
+      service-plan: application
+
+  - name: spreadsheet-upload-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: spreadsheet-upload-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: spreadsheet-upload-html5-service
+      service-plan: app-host
+
+  - name: spreadsheet-upload-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: spreadsheet-upload-destination-service
+      service-plan: lite

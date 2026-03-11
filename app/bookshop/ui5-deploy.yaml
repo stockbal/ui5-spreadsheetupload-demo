@@ -1,0 +1,34 @@
+specVersion: "3.1"
+metadata:
+  name: demo.bookshop
+type: application
+builder:
+  customTasks:
+    - name: ui5-tooling-transpile-task
+      afterTask: replaceVersion
+      configuration:
+        debug: true
+        transformModulesToUI5:
+          overridesToOverride: true
+    - name: webide-extension-task-updateManifestJson
+      afterTask: replaceVersion
+      configuration:
+        appFolder: webapp
+        destDir: dist
+    - name: ui5-task-zipper
+      afterTask: generateCachebusterInfo
+      configuration:
+        archiveName: demobookshop
+        includeDependencies:
+          - ui5-cc-spreadsheetimporter-v1-7-4
+        additionalFiles:
+          - xs-app.json
+    - name: ui5-task-btp-manifest
+      afterTask: replaceVersion
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+resources:
+  configuration:
+    propertiesFileSourceEncoding: UTF-8
