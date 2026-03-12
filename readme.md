@@ -1,6 +1,6 @@
 # Embedded Spreadsheet Importer Component Deployment
 
-Small sample CAP project with 2 FE application which both use the [Spreadsheet Importer](https://docs.spreadsheet-importer.com/pages/GettingStarted/#btp-environment) with decentralized (embedded) deployment.
+Small sample CAP project with 3 FE application which both use the [Spreadsheet Importer](https://docs.spreadsheet-importer.com/pages/GettingStarted/#btp-environment) with decentralized (embedded) deployment.
 
 To avoid the mentioned issues, a custom script is used post ui5 build, to make the component id of the embedded spreadsheet importer unique to the consuming application
 
