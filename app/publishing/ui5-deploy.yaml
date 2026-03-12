@@ -23,8 +23,6 @@ builder:
           - ui5-cc-spreadsheetimporter-v1-7-4
         additionalFiles:
           - xs-app.json
-    - name: ui5-task-btp-manifest
-      afterTask: replaceVersion
   resources:
     excludes:
       - /test/**
