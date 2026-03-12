@@ -10,6 +10,7 @@ build-parameters:
     - builder: custom
       commands:
         - npx cds build --production
+
 modules:
   - name: spreadsheet-upload-srv
     type: nodejs
@@ -91,6 +92,10 @@ modules:
             - demopublishing.zip
           name: demopublishing
           target-path: resources/
+        - artifacts:
+            - demomanageauthors.zip
+          name: demomanageauthors
+          target-path: resources/
 
   - name: demobookshop
     type: html5
@@ -111,6 +116,17 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []
+
+  - name: demomanageauthors
+    type: html5
+    path: app/manageauthors
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+
 resources:
   - name: spreadsheet-upload-auth
     type: org.cloudfoundry.managed-service
@@ -131,6 +147,7 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
+
   - name: spreadsheet-upload-repo-host
     type: org.cloudfoundry.managed-service
     parameters:

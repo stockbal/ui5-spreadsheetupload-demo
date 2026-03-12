@@ -20,7 +20,8 @@
     "undeploy": "cf undeploy spreadsheet-upload --delete-services --delete-service-keys --delete-service-brokers",
     "build": "rimraf resources mta_archives && mbt build --mtar archive",
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
-    "watch-publishing": "cds watch --open demo.publishing/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-publishing": "cds watch --open demo.publishing/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-manageauthors": "cds watch --open demo.manageauthors/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "cds": {
@@ -40,6 +41,7 @@
   ],
   "sapux": [
     "app/bookshop",
-    "app/publishing"
+    "app/publishing",
+    "app/manageauthors"
   ]
 }
