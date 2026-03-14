@@ -10,9 +10,10 @@
     "@cap-js/sqlite": "^2",
     "@sap/cds-dk": "^9",
     "cds-plugin-ui5": "^0.16.3",
-    "jszip": "^3.10.1",
-    "mbt": "^1.2.29",
-    "rimraf": "^5.0.5"
+    "mbt": "^1.2.43",
+    "rimraf": "^5.0.5",
+    "yauzl": "^3.2.1",
+    "yazl": "^3.3.1"
   },
   "scripts": {
     "start": "cds-serve",
